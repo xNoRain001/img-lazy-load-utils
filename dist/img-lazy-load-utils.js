@@ -848,20 +848,7 @@
     });
   };
 
-  var getOffsetTop = function getOffsetTop(el) {
-    var offsetTop = el.offsetTop,
-        offsetParent = el.offsetParent;
-
-    while (offsetParent && offsetParent.tagName !== 'BODY') {
-      offsetTop += offsetParent.offsetTop;
-      offsetParent = offsetParent.offsetParent;
-    }
-
-    return offsetTop;
-  };
-
   var handler = function handler(lazyLoad) {
-    console.log('@');
     var lazyDivs = lazyLoad.lazyDivs;
 
     var _lazyDivs = lazyDivs.get();
@@ -876,17 +863,15 @@
 
         if (isLoaded(img)) {
           return;
-        } // 获取容器底部距离 body 最上面的偏移
+        }
 
+        var clientHeight = document.documentElement.clientHeight;
 
-        var divOffsetTop = getOffsetTop(div) + div.offsetHeight; // 获取可视区底部距离 body 最上面的偏移
+        var _div$getBoundingClien = div.getBoundingClientRect(),
+            bottom = _div$getBoundingClien.bottom,
+            top = _div$getBoundingClien.top;
 
-        var _document$documentEle = document.documentElement,
-            scrollTop = _document$documentEle.scrollTop,
-            clientHeight = _document$documentEle.clientHeight;
-        var viewOffsetTop = scrollTop + clientHeight;
-
-        if (divOffsetTop <= viewOffsetTop) {
+        if (bottom <= clientHeight && top >= 0) {
           // 图片完全出现在可视区
           displayImg(img);
           lazyDivs["delete"](div);
@@ -915,6 +900,42 @@
     window.addEventListener('scroll', cb);
   };
 
+  var addObserver = function addObserver(lazyLoad) {
+    var ob = new IntersectionObserver(function (entries) {
+      // isIntersecting 表示元素是否与视口交叉。初始化时回调触发一次，之后滚轮滚动会触
+      // 发回调（自带节流）
+      _.each(entries, function (_, entry) {
+        var target = entry.target,
+            isIntersecting = entry.isIntersecting;
+        var img = target.querySelector('img');
+
+        if ((isLazy(target) || isLazy(img)) && !isLoaded(img) && isIntersecting) {
+          displayImg(img); // 取消监视
+
+          ob.unobserve(target);
+        }
+      });
+    }, {
+      threshold: [1]
+    });
+    var lazyDivs = lazyLoad.lazyDivs.get();
+
+    var _iterator = _createForOfIteratorHelper(lazyDivs),
+        _step;
+
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var div = _step.value;
+        // 监视 lazyDiv
+        ob.observe(div);
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+  };
+
   var removeListener = function removeListener() {
     window.removeEventListener('scroll', shared.cb);
   };
@@ -931,7 +952,7 @@
       value: function start() {
         this.lazyDivs.clear();
         this.lazyDivs.init();
-        addListener(this);
+        IntersectionObserver ? addObserver(this) : addListener(this);
       }
     }, {
       key: "over",

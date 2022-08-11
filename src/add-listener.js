@@ -1,10 +1,8 @@
 import shared from './shared'
 import displayImg from './display-img'
-import getOffsetTop from './get-offset-top'
 import { isLoaded } from './utils'
 
 const handler = lazyLoad => {
-  console.log('@')
   const { lazyDivs } = lazyLoad
   const _lazyDivs = lazyDivs.get()
 
@@ -16,15 +14,11 @@ const handler = lazyLoad => {
       return
     }
 
-    // 获取容器底部距离 body 最上面的偏移
-    const divOffsetTop = getOffsetTop(div) + div.offsetHeight
+    const { clientHeight } = document.documentElement
+    const { bottom, top } = div.getBoundingClientRect()
 
-    // 获取可视区底部距离 body 最上面的偏移
-    const { scrollTop, clientHeight } = document.documentElement
-    const viewOffsetTop = scrollTop + clientHeight
-
-    if (divOffsetTop <= viewOffsetTop) {
-
+    if (bottom <= clientHeight && top >= 0) {
+      
       // 图片完全出现在可视区
       displayImg(img)
       lazyDivs.delete(div)

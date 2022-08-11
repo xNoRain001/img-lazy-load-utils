@@ -1,5 +1,6 @@
 import LazyDivs from "./lazy-divs"
 import addListener from './add-listener'
+import addObserver from "./add-observer"
 import removeListener from './remove-listener'
 
 class LazyLoad {
@@ -10,7 +11,10 @@ class LazyLoad {
   start () {
     this.lazyDivs.clear()
     this.lazyDivs.init()
-    addListener(this)
+
+    IntersectionObserver
+      ? addObserver(this)
+      : addListener(this)
   }
 
   over () {
