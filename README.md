@@ -64,11 +64,42 @@ npm i img-lazy-load-utils
   </div>
 
   <script src="../dist/img-lazy-load-utils.js"></script>
+
   <script>
     const lazyLoad = new LazyLoad()
 
     // 开启懒加载
     lazyLoad.start()
+  </script>
+
+  <script>
+    // 对于从服务器获取的图片 url，如瀑布流，在获取完后再调用 start。
+    request('/...').then(res => {
+      const columns = Array.from(document.querySelectorAll('.column'))
+      const step = columns.length
+
+
+      for (let i = 0, l = res.length; i < l; i += step) {
+        const groups = res.slice(i, i + 3).sort((a, b) => a.height - b.height)
+        columns.sort((a, b) => b.clientHeight - a.clientHeight)
+
+        for (let j = 0; j < step; j++) {
+          columns[j].innerHTML += `
+            <div class="card">
+              <a href="javascript;;">
+                <div class="lazy-div" style="height: ${ groups[j].height }px;">
+                  <img lazy url="${ groups[j].src }">
+                </div>
+              </a>
+            </div>
+          `
+        }
+      }
+      
+      const lazyLoad = new LazyLoad()
+
+      lazyLoad.start()
+    })
   </script>
 </body>
 
