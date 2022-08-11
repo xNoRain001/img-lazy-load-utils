@@ -1,7 +1,5 @@
-import shared from "./shared"
-
-const removeListener = () => {
-  window.removeEventListener('scroll', shared.cb)
+const removeListener = lazyLoad => {
+  window.removeEventListener('scroll', lazyLoad.cb)
 }
 
 export default removeListener

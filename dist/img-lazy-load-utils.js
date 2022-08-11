@@ -775,9 +775,12 @@
     };
   }
 
-  var addNonLoadedStyle = function addNonLoadedStyle(div, img) {
-    div.style.backgroundColor = '#ddd';
-    img.style.cssText = "\n    opacity: 0;\n    transition: opacity .3s;\n  ";
+  var addNonLoadedStyle = function addNonLoadedStyle(div, img, lazyLoad) {
+    var _lazyLoad$style = lazyLoad.style,
+        backgroundColor = _lazyLoad$style.backgroundColor,
+        transition = _lazyLoad$style.transition;
+    div.style.backgroundColor = backgroundColor;
+    img.style.cssText = "\n    opacity: 0;\n    transition: ".concat(transition, ";\n  ");
   };
 
   var isLazy = function isLazy(el) {
@@ -807,7 +810,7 @@
       }
     }, {
       key: "init",
-      value: function init() {
+      value: function init(lazyLoad) {
         var _this = this;
 
         var divs = document.querySelectorAll('div');
@@ -816,7 +819,7 @@
           var img = div.querySelector('img');
 
           if (isLazy(div) || isLazy(img)) {
-            addNonLoadedStyle(div, img);
+            addNonLoadedStyle(div, img, lazyLoad);
           }
 
           _this.add(div);
@@ -837,14 +840,14 @@
     return LazyDivs;
   }();
 
-  var shared = {};
-
   var displayImg = function displayImg(img) {
-    img.src = img.getAttribute('url') || img.parentNode.getAttribute('url');
+    var parent = img.parentNode;
+    img.src = img.getAttribute('url') || parent.getAttribute('url');
     img.addEventListener('load', function () {
       img.style.opacity = 1;
       img.setAttribute('loaded', true);
       img.removeAttribute('url');
+      parent.removeAttribute('url');
     });
   };
 
@@ -893,7 +896,7 @@
   });
 
   var addListener = function addListener(lazyLoad) {
-    var cb = shared.cb = function () {
+    var cb = lazyLoad.cb = function () {
       throttled(lazyLoad);
     };
 
@@ -901,7 +904,7 @@
   };
 
   var addObserver = function addObserver(lazyLoad) {
-    var ob = new IntersectionObserver(function (entries) {
+    var ob = lazyLoad.ob = new IntersectionObserver(function (entries) {
       // isIntersecting 表示元素是否与视口交叉。初始化时回调触发一次，之后滚轮滚动会触
       // 发回调（自带节流）
       _.each(entries, function (_, entry) {
@@ -936,28 +939,37 @@
     }
   };
 
-  var removeListener = function removeListener() {
-    window.removeEventListener('scroll', shared.cb);
+  var removeListener = function removeListener(lazyLoad) {
+    window.removeEventListener('scroll', lazyLoad.cb);
+  };
+
+  var removeObserver = function removeObserver(lazyLoad) {
+    lazyLoad.ob.disconnect();
   };
 
   var LazyLoad = /*#__PURE__*/function () {
     function LazyLoad() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
       _classCallCheck(this, LazyLoad);
 
       this.lazyDivs = new LazyDivs();
+      this.style = Object.create(null);
+      this.style.backgroundColor = options.backgroundColor || '#ddd';
+      this.style.transition = options.transition || 'opacity 2.0s';
     }
 
     _createClass(LazyLoad, [{
       key: "start",
       value: function start() {
         this.lazyDivs.clear();
-        this.lazyDivs.init();
+        this.lazyDivs.init(this);
         IntersectionObserver ? addObserver(this) : addListener(this);
       }
     }, {
       key: "over",
       value: function over() {
-        removeListener();
+        IntersectionObserver ? removeObserver(this) : removeListener(this);
       }
     }]);
 

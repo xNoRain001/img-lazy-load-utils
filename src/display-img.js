@@ -1,10 +1,12 @@
 const displayImg = img => {
-  img.src = img.getAttribute('url') || img.parentNode.getAttribute('url')
+  const parent = img.parentNode
+  img.src = img.getAttribute('url') || parent.getAttribute('url')
 
   img.addEventListener('load', () => {
     img.style.opacity = 1
     img.setAttribute('loaded', true)
     img.removeAttribute('url')
+    parent.removeAttribute('url')
   })
 }
 

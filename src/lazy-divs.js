@@ -14,14 +14,14 @@ class LazyDivs {
     this.lazyDivs.clear()
   }
 
-  init () {
+  init (lazyLoad) {
     const divs = document.querySelectorAll('div')
 
     _.each(divs, (_, div) => {
       const img = div.querySelector('img')
 
       if (isLazy(div) || isLazy(img)) {
-        addNonLoadedStyle(div, img)
+        addNonLoadedStyle(div, img, lazyLoad)
       }
 
       this.add(div)

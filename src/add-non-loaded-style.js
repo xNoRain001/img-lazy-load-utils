@@ -1,8 +1,10 @@
-const addNonLoadedStyle = (div, img) => {
-  div.style.backgroundColor = '#ddd'
+const addNonLoadedStyle = (div, img, lazyLoad) => {
+  const { backgroundColor, transition } = lazyLoad.style
+
+  div.style.backgroundColor = backgroundColor
   img.style.cssText = `
     opacity: 0;
-    transition: opacity .3s;
+    transition: ${ transition };
   `
 }
 

@@ -33,7 +33,7 @@ npm i img-lazy-load-utils
       height: 500%;
     }
 
-    /* 设置占位背景的宽高 */
+    /* 设置占位背景的宽高，应该要和图片展示时的宽高一致。 */
     .lazy-div {
       width: 200px;
       height: 200px;
@@ -60,16 +60,30 @@ npm i img-lazy-load-utils
   </div>
 
   <div class="lazy-div" lazy url="./baz.webp">
-    <img >
+    <img>
   </div>
 
   <script src="../dist/img-lazy-load-utils.js"></script>
   <script>
     const lazyLoad = new LazyLoad()
 
+    // 开启懒加载
     lazyLoad.start()
   </script>
 </body>
 
 </html>
+```
+
+## APIs
+
+```javascript
+// 开启懒加载，支持自定义背景色和动画时间
+lazyLoad.start({
+  backgroundColor: '#ddd', // 占位背景色
+  transition: 'opacity .3s', // 图片 opacity 从 0 变为 1 的动画时间
+})
+
+// 取消懒加载
+lazyLoad.over()
 ```

@@ -1,4 +1,3 @@
-import shared from './shared'
 import displayImg from './display-img'
 import { isLoaded } from './utils'
 
@@ -33,7 +32,7 @@ const handler = lazyLoad => {
 const throttled = _.throttle(handler, 200, { trailing: true })
 
 const addListener = lazyLoad => {
-  const cb = shared.cb = () => {
+  const cb = lazyLoad.cb = () => {
     throttled(lazyLoad)
   }
 
