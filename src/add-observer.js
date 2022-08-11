@@ -22,7 +22,7 @@ const addObserver = lazyLoad => {
       }
     })
   }, {
-    threshold: [1]
+    threshold: [0, 1]
   })
 
   const lazyDivs = lazyLoad.lazyDivs.get()
