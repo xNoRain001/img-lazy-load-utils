@@ -4,196 +4,6 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.LazyLoad = factory());
 })(this, (function () { 'use strict';
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  function _defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  function _createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) _defineProperties(Constructor, staticProps);
-    Object.defineProperty(Constructor, "prototype", {
-      writable: false
-    });
-    return Constructor;
-  }
-
-  function _unsupportedIterableToArray(o, minLen) {
-    if (!o) return;
-    if (typeof o === "string") return _arrayLikeToArray(o, minLen);
-    var n = Object.prototype.toString.call(o).slice(8, -1);
-    if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(o);
-    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
-  }
-
-  function _arrayLikeToArray(arr, len) {
-    if (len == null || len > arr.length) len = arr.length;
-
-    for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-
-    return arr2;
-  }
-
-  function _createForOfIteratorHelper(o, allowArrayLike) {
-    var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
-
-    if (!it) {
-      if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
-        if (it) o = it;
-        var i = 0;
-
-        var F = function () {};
-
-        return {
-          s: F,
-          n: function () {
-            if (i >= o.length) return {
-              done: true
-            };
-            return {
-              done: false,
-              value: o[i++]
-            };
-          },
-          e: function (e) {
-            throw e;
-          },
-          f: F
-        };
-      }
-
-      throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-    }
-
-    var normalCompletion = true,
-        didErr = false,
-        err;
-    return {
-      s: function () {
-        it = it.call(o);
-      },
-      n: function () {
-        var step = it.next();
-        normalCompletion = step.done;
-        return step;
-      },
-      e: function (e) {
-        didErr = true;
-        err = e;
-      },
-      f: function () {
-        try {
-          if (!normalCompletion && it.return != null) it.return();
-        } finally {
-          if (didErr) throw err;
-        }
-      }
-    };
-  }
-
-  var isLoaded = function isLoaded(el) {
-    return _.isDef(el.getAttribute('loaded'));
-  };
-
-  var displayImg = function displayImg(img) {
-    img.src = img.getAttribute('url') || img.parentNode.getAttribute('url');
-    img.addEventListener('load', function () {
-      img.style.opacity = 1;
-      img.setAttribute('loaded', true);
-      img.removeAttribute('url');
-    });
-  };
-
-  var getOffsetTop = function getOffsetTop(el) {
-    var offsetTop = el.offsetTop,
-        offsetParent = el.offsetParent;
-
-    while (offsetParent && offsetParent.tagName !== 'BODY') {
-      offsetTop += offsetParent.offsetTop;
-      offsetParent = offsetParent.offsetParent;
-    }
-
-    return offsetTop;
-  };
-
-  var handler = function handler(lazyLoad) {
-    console.log(lazyLoad);
-    var lazyDivs = lazyLoad.lazyDivs;
-
-    var _iterator = _createForOfIteratorHelper(lazyDivs),
-        _step;
-
-    try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var div = _step.value;
-        var img = div.querySelector('img'); // 已经加载
-
-        if (isLoaded(img)) {
-          return;
-        } // 获取容器底部距离 body 最上面的偏移
-
-
-        var divOffsetTop = getOffsetTop(div) + div.offsetHeight; // 获取可视区底部距离 body 最上面的偏移
-
-        var _document$documentEle = document.documentElement,
-            scrollTop = _document$documentEle.scrollTop,
-            clientHeight = _document$documentEle.clientHeight;
-        var viewOffsetTop = scrollTop + clientHeight;
-
-        if (divOffsetTop <= viewOffsetTop) {
-          // 图片完全出现在可视区
-          displayImg(img);
-          lazyDivs["delete"](div);
-        }
-      }
-    } catch (err) {
-      _iterator.e(err);
-    } finally {
-      _iterator.f();
-    }
-
-    if (lazyDivs.size === 0) {
-      lazyLoad.end();
-    }
-  };
-
-  var isLazy = function isLazy(el) {
-    return _.isDef(el.getAttribute('lazy'));
-  };
-
-  var addNonLoadedStyle = function addNonLoadedStyle(div, img) {
-    div.style.backgroundColor = '#ddd';
-    img.style.cssText = "\n    opacity: 0;\n    transition: opacity .3s;\n  ";
-  };
-
-  var shared = {};
-
-  var addHandler = function addHandler(lazyLoad) {
-    var throttled = lazyLoad.throttled;
-
-    var _throttled = shared._throttled = function () {
-      throttled(lazyLoad);
-    };
-
-    window.addEventListener('scroll', _throttled);
-  };
-
-  var removeHandler = function removeHandler() {
-    window.removeEventListener('scroll', shared._throttled);
-  };
-
   (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -866,26 +676,138 @@
 
   }));
 
-  _.init('each', 'isDef', 'throttle');
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
-  var LazyLoad = /*#__PURE__*/function () {
-    function LazyLoad(wait) {
-      _classCallCheck(this, LazyLoad);
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
 
-      this.lazyDivs = new Set();
-      this.throttled = _.throttle(handler, wait, {
-        trailing: true
-      });
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    Object.defineProperty(Constructor, "prototype", {
+      writable: false
+    });
+    return Constructor;
+  }
+
+  function _unsupportedIterableToArray(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(o);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  }
+
+  function _arrayLikeToArray(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+
+    for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+    return arr2;
+  }
+
+  function _createForOfIteratorHelper(o, allowArrayLike) {
+    var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
+
+    if (!it) {
+      if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+        if (it) o = it;
+        var i = 0;
+
+        var F = function () {};
+
+        return {
+          s: F,
+          n: function () {
+            if (i >= o.length) return {
+              done: true
+            };
+            return {
+              done: false,
+              value: o[i++]
+            };
+          },
+          e: function (e) {
+            throw e;
+          },
+          f: F
+        };
+      }
+
+      throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
     }
 
-    _createClass(LazyLoad, [{
-      key: "clearLazyDivs",
-      value: function clearLazyDivs() {
+    var normalCompletion = true,
+        didErr = false,
+        err;
+    return {
+      s: function () {
+        it = it.call(o);
+      },
+      n: function () {
+        var step = it.next();
+        normalCompletion = step.done;
+        return step;
+      },
+      e: function (e) {
+        didErr = true;
+        err = e;
+      },
+      f: function () {
+        try {
+          if (!normalCompletion && it.return != null) it.return();
+        } finally {
+          if (didErr) throw err;
+        }
+      }
+    };
+  }
+
+  var addNonLoadedStyle = function addNonLoadedStyle(div, img) {
+    div.style.backgroundColor = '#ddd';
+    img.style.cssText = "\n    opacity: 0;\n    transition: opacity .3s;\n  ";
+  };
+
+  var isLazy = function isLazy(el) {
+    return _.isDef(el.getAttribute('lazy'));
+  };
+
+  var isLoaded = function isLoaded(el) {
+    return _.isDef(el.getAttribute('loaded'));
+  };
+
+  var LazyDivs = /*#__PURE__*/function () {
+    function LazyDivs() {
+      _classCallCheck(this, LazyDivs);
+
+      this.lazyDivs = new Set();
+    }
+
+    _createClass(LazyDivs, [{
+      key: "delete",
+      value: function _delete(div) {
+        this.lazyDivs["delete"](div);
+      }
+    }, {
+      key: "clear",
+      value: function clear() {
         this.lazyDivs.clear();
       }
     }, {
-      key: "getLazyDivs",
-      value: function getLazyDivs() {
+      key: "init",
+      value: function init() {
         var _this = this;
 
         var divs = document.querySelectorAll('div');
@@ -897,25 +819,131 @@
             addNonLoadedStyle(div, img);
           }
 
-          _this.lazyDivs.add(div);
+          _this.add(div);
         });
       }
     }, {
-      key: "start",
-      value: function start() {
-        this.clearLazyDivs();
-        this.getLazyDivs();
-        addHandler(this);
+      key: "add",
+      value: function add(div) {
+        this.lazyDivs.add(div);
       }
     }, {
-      key: "end",
-      value: function end() {
-        removeHandler(this.throttled);
+      key: "get",
+      value: function get() {
+        return this.lazyDivs;
+      }
+    }]);
+
+    return LazyDivs;
+  }();
+
+  var shared = {};
+
+  var displayImg = function displayImg(img) {
+    img.src = img.getAttribute('url') || img.parentNode.getAttribute('url');
+    img.addEventListener('load', function () {
+      img.style.opacity = 1;
+      img.setAttribute('loaded', true);
+      img.removeAttribute('url');
+    });
+  };
+
+  var getOffsetTop = function getOffsetTop(el) {
+    var offsetTop = el.offsetTop,
+        offsetParent = el.offsetParent;
+
+    while (offsetParent && offsetParent.tagName !== 'BODY') {
+      offsetTop += offsetParent.offsetTop;
+      offsetParent = offsetParent.offsetParent;
+    }
+
+    return offsetTop;
+  };
+
+  var handler = function handler(lazyLoad) {
+    console.log('@');
+    var lazyDivs = lazyLoad.lazyDivs;
+
+    var _lazyDivs = lazyDivs.get();
+
+    var _iterator = _createForOfIteratorHelper(_lazyDivs),
+        _step;
+
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var div = _step.value;
+        var img = div.querySelector('img'); // 已经加载
+
+        if (isLoaded(img)) {
+          return;
+        } // 获取容器底部距离 body 最上面的偏移
+
+
+        var divOffsetTop = getOffsetTop(div) + div.offsetHeight; // 获取可视区底部距离 body 最上面的偏移
+
+        var _document$documentEle = document.documentElement,
+            scrollTop = _document$documentEle.scrollTop,
+            clientHeight = _document$documentEle.clientHeight;
+        var viewOffsetTop = scrollTop + clientHeight;
+
+        if (divOffsetTop <= viewOffsetTop) {
+          // 图片完全出现在可视区
+          displayImg(img);
+          lazyDivs["delete"](div);
+        }
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+
+    if (_lazyDivs.size === 0) {
+      lazyLoad.over();
+    }
+  };
+
+  var throttled = _.throttle(handler, 200, {
+    trailing: true
+  });
+
+  var addListener = function addListener(lazyLoad) {
+    var cb = shared.cb = function () {
+      throttled(lazyLoad);
+    };
+
+    window.addEventListener('scroll', cb);
+  };
+
+  var removeListener = function removeListener() {
+    window.removeEventListener('scroll', shared.cb);
+  };
+
+  var LazyLoad = /*#__PURE__*/function () {
+    function LazyLoad() {
+      _classCallCheck(this, LazyLoad);
+
+      this.lazyDivs = new LazyDivs();
+    }
+
+    _createClass(LazyLoad, [{
+      key: "start",
+      value: function start() {
+        this.lazyDivs.clear();
+        this.lazyDivs.init();
+        addListener(this);
+      }
+    }, {
+      key: "over",
+      value: function over() {
+        removeListener();
       }
     }]);
 
     return LazyLoad;
   }();
+
+  _.init('each', 'isDef', 'throttle');
 
   return LazyLoad;
 

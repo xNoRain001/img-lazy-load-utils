@@ -1,12 +1,14 @@
-import isLoaded from './is-loaded'
+import shared from './shared'
 import displayImg from './display-img'
 import getOffsetTop from './get-offset-top'
+import { isLoaded } from './utils'
 
 const handler = lazyLoad => {
-  console.log(lazyLoad)
+  console.log('@')
   const { lazyDivs } = lazyLoad
+  const _lazyDivs = lazyDivs.get()
 
-  for (const div of lazyDivs) {
+  for (const div of _lazyDivs) {
     const img = div.querySelector('img')
 
     // 已经加载
@@ -25,14 +27,23 @@ const handler = lazyLoad => {
 
       // 图片完全出现在可视区
       displayImg(img)
-
       lazyDivs.delete(div)
     }
   }
 
-  if (lazyDivs.size === 0) {
-    lazyLoad.end()
+  if (_lazyDivs.size === 0) {
+    lazyLoad.over()
   }
 }
 
-export default handler
+const throttled = _.throttle(handler, 200, { trailing: true })
+
+const addListener = lazyLoad => {
+  const cb = shared.cb = () => {
+    throttled(lazyLoad)
+  }
+
+  window.addEventListener('scroll', cb)
+}
+
+export default addListener
